@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for full-server-icy-star-273 on 2024-02-29T15:20:05-03:00
+# fly.toml app configuration file generated for full-server-summer-firefly-7354 on 2024-02-29T17:14:08-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'full-server-icy-star-273'
+app = 'full-server-summer-firefly-7354'
 primary_region = 'scl'
 
 [build]
