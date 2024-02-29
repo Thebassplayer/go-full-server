@@ -1,7 +1,7 @@
 # Use the official Golang image to create a build artifact.
 # This is based on Debian and sets the GOPATH to /go.
 # The specific image version may need to be updated over time.
-FROM golang:1.22.0darwin AS builder
+FROM golang:1.22.0 AS builder
 
 # Set the working directory outside $GOPATH to enable Go modules support.
 WORKDIR /app
