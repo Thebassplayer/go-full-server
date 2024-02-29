@@ -62,6 +62,7 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	http.Error(w, "Movie not found", http.StatusNotFound)
 }
 
 func deleteMovie(w http.ResponseWriter, r *http.Request) {
@@ -109,6 +110,7 @@ func creteMovie(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	http.Error(w, "Movie not found", http.StatusNotFound)
 }
 
 func updateMovie(w http.ResponseWriter, r *http.Request) {
