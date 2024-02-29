@@ -27,25 +27,11 @@ var movies []Movie
 
 func getMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(movies)
-}
-
-func deleteMovie(w http.ResponseWriter, r *http.Request) {
-	// Set the Content-Type header to indicate that the response will be in JSON format
-	w.Header().Set("Content-Type", "application/json")
-
-	// Extract the route parameters from the request using Gorilla Mux
-	params := mux.Vars(r)
-
-	// Iterate over the movies slice to find the movie with the specified ID
-	for index, movie := range movies {
-		if movie.ID == params["id"] {
-			// If the movie with the specified ID is found, remove it from the movies slice
-			movies = append(movies[:index], movies[index+1:]...)
-			break
-		}
+	err := json.NewEncoder(w).Encode(movies)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	json.NewEncoder(w).Encode(movies)
 }
 
 func getMovie(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +50,33 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func deleteMovie(w http.ResponseWriter, r *http.Request) {
+	// Set the Content-Type header to indicate that the response will be in JSON format
+	w.Header().Set("Content-Type", "application/json")
+
+	// Extract the route parameters from the request using Gorilla Mux
+	params := mux.Vars(r)
+
+	// Iterate over the movies slice to find the movie with the specified ID
+	for index, movie := range movies {
+		if movie.ID == params["id"] {
+			// If the movie with the specified ID is found, remove it from the movies slice
+			movies = append(movies[:index], movies[index+1:]...)
+			break
+		}
+	}
+
+	response := map[string]interface{}{
+		"message":          "Movie deleted successfully",
+		"remaining movies": movies,
+	}
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func creteMovie(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -72,7 +85,16 @@ func creteMovie(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&movie)
 	movie.ID = strconv.Itoa(rand.Intn(1000000))
 	movies = append(movies, movie)
-	json.NewEncoder(w).Encode(movie)
+	response := map[string]interface{}{
+		"message": "Movie created successfully",
+		"movie":   movie,
+	}
+
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func updateMovie(w http.ResponseWriter, r *http.Request) {
