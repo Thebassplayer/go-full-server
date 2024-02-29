@@ -75,6 +75,41 @@ func creteMovie(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(movie)
 }
 
+func updateMovie(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	for index, item := range movies {
+		if item.ID == params["id"] {
+			movies = append(movies[:index], movies[index+1:]...)
+
+			var movie Movie
+			err := json.NewDecoder(r.Body).Decode(&movie)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			movie.ID = strconv.Itoa(rand.Intn(1000000)) // Generate random ID
+			movies = append(movies, movie)
+
+			response := map[string]interface{}{
+				"message": "Movie updated successfully",
+				"movie":   movie,
+			}
+
+			err = json.NewEncoder(w).Encode(response)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+	}
+
+	http.Error(w, "Movie not found", http.StatusNotFound)
+}
+
 func main() {
 	r := mux.NewRouter()
 
@@ -94,7 +129,7 @@ func main() {
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movies", creteMovie).Methods("POST")
-	// r.HandleFunc("/movies/[id]", updateMovie).Methods("PUT")
+	r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 
 	fmt.Printf("Starting server at port 8000\n")
