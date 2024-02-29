@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the entire source code from the current directory to the working directory inside the container
-COPY *.go ./
+COPY . ./
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -o /full-server

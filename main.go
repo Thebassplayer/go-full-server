@@ -25,6 +25,20 @@ type Director struct {
 
 var movies []Movie
 
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Log the path hit
+		log.Println("Path hit:", r.URL.Path)
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./index.html")
+}
+
 func getMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(movies)
@@ -135,6 +149,8 @@ func updateMovie(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 
+	r.Use(loggingMiddleware)
+
 	movies = append(movies, Movie{
 		ID:       "1",
 		ISBN:     "448743",
@@ -148,6 +164,7 @@ func main() {
 		Director: &Director{Firstname: "Charles", Lastname: "Chaplin"},
 	})
 
+	r.HandleFunc("/", rootHandler).Methods("GET")
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movies", creteMovie).Methods("POST")
