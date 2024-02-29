@@ -18,6 +18,6 @@ COPY *.go ./
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -o /full-server
 
-EXPOSE 8000
+EXPOSE 8080
 # Run the web service on container startup.
 CMD ["/full-server"]
