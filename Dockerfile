@@ -1,7 +1,7 @@
 # Use the official Golang image to create a build artifact.
 # This is based on Debian and sets the GOPATH to /go.
 # The specific image version may need to be updated over time.
-FROM golang:1.22.0 AS builder
+FROM golang:1.22 AS builder
 
 # Set the working directory outside $GOPATH to enable Go modules support.
 WORKDIR /app
@@ -13,20 +13,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the entire source code from the current directory to the working directory inside the container
-COPY . .
+COPY *.go ./
 
 # Build the Go app
-RUN go build -o ./go-full-server ./main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /full-server
 
-# Use the official Alpine image for a lean production container.
-# https://hub.docker.com/_/alpine
-# The specific image version may need to be updated over time.
-FROM alpine:latest AS runner
-
-WORKDIR /app
-
-# Copy the binary to the production image from the builder stage.
-COPY --from=builder /app/go-full-server .
-
+EXPOSE 8000
 # Run the web service on container startup.
-CMD ["./go-full-server"]
+CMD ["/full-server"]
